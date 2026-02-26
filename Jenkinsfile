@@ -7,26 +7,23 @@ pipeline {
     }
 
     triggers {
-        
         cron('H/5 * * * 4')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/JeremiahMoochun/spring-petclinic.git'
+                checkout scm
             }
         }
 
         stage('Build & Test with JaCoCo') {
             steps {
-                
-                sh './mvnw clean package -Dspring-javaformat.skip=true -Dcheckstyle.skip=true'
+                bat 'mvnw.cmd clean package -Dspring-javaformat.skip=true -Dcheckstyle.skip=true'
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/*.xml'
-
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
                     jacoco(
                         execPattern: '**/target/jacoco.exec',
                         classPattern: '**/target/classes',
